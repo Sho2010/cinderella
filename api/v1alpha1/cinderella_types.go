@@ -89,8 +89,11 @@ type CinderellaStatus struct {
 	ExpiredAt string `json:"expireadAt"`
 }
 
+//TODO set printcolumn +kubebuilder:printcolumn:name:="Alias",type=string,JSONPath=`.spec.alias`
+//TODO set printcolumn +kubebuilder:printcolumn:name:="Status",type=string,JSONPath=`.spec.status.expireadAt`
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:resource:shortName=cin;prole
 
 // Cinderella is the Schema for the cinderellas API
 type Cinderella struct {

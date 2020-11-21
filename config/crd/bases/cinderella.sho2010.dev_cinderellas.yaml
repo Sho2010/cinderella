@@ -13,6 +13,9 @@ spec:
     kind: Cinderella
     listKind: CinderellaList
     plural: cinderellas
+    shortNames:
+    - cin
+    - prole
     singular: cinderella
   scope: Namespaced
   subresources:
