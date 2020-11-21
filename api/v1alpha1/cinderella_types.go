@@ -53,7 +53,7 @@ type Encryption struct {
 	// +kubebuilder:validation:Format:=string
 
 	// Use the github public key to encrypt the authentication file.
-	Github string `json:"github,omitempty"`
+	Github Github `json:"github,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format:=string
@@ -70,7 +70,6 @@ type Github struct {
 	// Github UserID
 	User string `json:"user,omitempty"`
 
-	// +kubebuilder:default:=1
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Optional
 

@@ -41,10 +41,22 @@ type CinderellaReconciler struct {
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 func (r *CinderellaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("cinderella", req.NamespacedName)
+	ctx := context.Background()
+	log := r.Log.WithValues("cinderella", req.NamespacedName)
 
-	// your logic here
+	log.Info("start reconciler")
+
+	var cinderella cinderellav1alpha1.Cinderella
+	log.Info("fetching Cinderella Resource")
+	if err := r.Get(ctx, req.NamespacedName, &cinderella); err != nil {
+		log.Error(err, "unable to fetch Cinderella")
+		// we'll ignore not-found errors, since they can't be fixed by an immediate
+		// requeue (we'll need to wait for a new notification), and we can get them
+		// on deleted requests.
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	log.Info("fetched item", "cinderella", cinderella)
 
 	return ctrl.Result{}, nil
 }
