@@ -1,0 +1,7 @@
+apiVersion: cinderella.sho2010.dev/v1alpha1
+kind: Cinderella
+metadata:
+  name: cinderella-sample
+spec:
+  # Add fields here
+  foo: bar
