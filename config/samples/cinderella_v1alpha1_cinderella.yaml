@@ -3,5 +3,9 @@ kind: Cinderella
 metadata:
   name: cinderella-sample
 spec:
-  # Add fields here
-  foo: bar
+  term:
+    expiresAfter: "60m"
+  encryption:
+    github:
+      user: sho2010
+      key: 1 # Optional

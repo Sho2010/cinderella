@@ -26,14 +26,68 @@ import (
 type CinderellaSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of Cinderella. Edit Cinderella_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// +kubebuilder:validation:Required
+
+	Term Term `json:"term,omitempty"`
+
+	// +kubebuilder:validation:Required
+
+	Encryption Encryption `json:"encryption,omitempty"`
+}
+
+type Term struct {
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Type=string
+
+	ExpiresAfter string `json:"expiresAfter,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:Format=date-time
+
+	ExpiresDate string `json:"expiresDate,omitempty"`
+}
+
+type Encryption struct {
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Format:=string
+
+	// Use the github public key to encrypt the authentication file.
+	Github string `json:"github,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Format:=string
+
+	// Use this public key to encrypt the authentication file.
+	// key format is OpenSSH public key format.
+	PublicKey string `json:"publicKey,omitempty"`
+}
+
+type Github struct {
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Format:=string
+
+	// Github UserID
+	User string `json:"user,omitempty"`
+
+	// +kubebuilder:default:=1
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Optional
+
+	// KeyNumber is line number of https://github.com/<user>.keys
+	// Default value: 1
+	KeyNumber *int32 `json:"keyNumber,omitempty"`
 }
 
 // CinderellaStatus defines the observed state of Cinderella
 type CinderellaStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:Format=date-time
+
+	// Expiread at binding account
+	ExpiredAt string `json:"expireadAt"`
 }
 
 // +kubebuilder:object:root=true
