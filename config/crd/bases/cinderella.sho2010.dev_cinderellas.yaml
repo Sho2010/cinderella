@@ -10,8 +10,9 @@ metadata:
 spec:
   additionalPrinterColumns:
   - JSONPath: .status.expiredAt
+    format: date-time
     name: Expired
-    type: date
+    type: string
   group: cinderella.sho2010.dev
   names:
     kind: Cinderella

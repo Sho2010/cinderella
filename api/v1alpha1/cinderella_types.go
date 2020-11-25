@@ -90,10 +90,14 @@ type CinderellaStatus struct {
 	ExpiredAt metav1.Time `json:"expiredAt,omitempty"`
 }
 
+// NOTE:
+// https://book.kubebuilder.io/reference/markers/crd.html
+// https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#additional-printer-columns
+
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=cin;prole
-// +kubebuilder:printcolumn:name="Expired",type="date",JSONPath=".status.expiredAt"
+// +kubebuilder:printcolumn:name="Expired",type="string",JSONPath=".status.expiredAt",format="date-time"
 
 // Cinderella is the Schema for the cinderellas API
 type Cinderella struct {
