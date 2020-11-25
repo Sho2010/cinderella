@@ -20,13 +20,19 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	cinderellav1alpha1 "github.com/Sho2010/cinderella/api/v1alpha1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
+)
+
+const (
+	ManagedLabel    = "cinderella.sho2010.dev/managed-by"
+	CinderellaLabel = "cinderella.sho2010.dev/cinderella"
 )
 
 // CinderellaReconciler reconciles a Cinderella object
@@ -39,6 +45,7 @@ type CinderellaReconciler struct {
 
 // +kubebuilder:rbac:groups=cinderella.sho2010.dev,resources=cinderellas,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=cinderella.sho2010.dev,resources=cinderellas/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=clusterrolebindings,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 func (r *CinderellaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
@@ -68,11 +75,58 @@ func (r *CinderellaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		}
 	}
 
+	crb, err := create(cinderella)
+	if err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	// Create or Update deployment object
+	if _, err := ctrl.CreateOrUpdate(ctx, r.Client, crb, func() error {
+		return nil
+	}); err != nil {
+
+		// error handling of ctrl.CreateOrUpdate
+		log.Error(err, "unable to ensure RBAC is correct")
+		return ctrl.Result{}, err
+	}
+
+	log.Info("fetched item", "cinderella", cinderella)
+
 	return ctrl.Result{}, nil
 }
 
+func create(cinderella cinderellav1alpha1.Cinderella) (*rbacv1.ClusterRoleBinding, error) {
+	subject := rbacv1.Subject{
+		Kind:      "ServiceAccount",
+		Name:      "test",
+		Namespace: "test",
+	}
+
+	crb := &rbacv1.ClusterRoleBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "cinderella:test",
+		},
+		Subjects: []rbacv1.Subject{subject},
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "ClusterRole",
+			Name:     "view",
+		},
+	}
+
+	labels := map[string]string{
+		ManagedLabel:    c.Name,
+		CinderellaLabel: "",
+	}
+	crb.SetLabels(labels)
+
+	return crb, nil
+}
+
 func (r *CinderellaReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	//NOTE: Ownsを書いてるがガベージコレクションされないのを調べる
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&cinderellav1alpha1.Cinderella{}).
+		Owns(&rbacv1.ClusterRoleBinding{}).
 		Complete(r)
 }
