@@ -85,15 +85,15 @@ type CinderellaStatus struct {
 	// +kubebuilder:validation:Type=string
 	// +kubebuilder:validation:Format=date-time
 
-	// Expiread at binding account
-	ExpiredAt string `json:"expireadAt"`
+	// ExpiredAt is expired at binding account
+	// ExpiredAt is RFC 3339 date and time at which this resource will be deleted.
+	ExpiredAt metav1.Time `json:"expiredAt,omitempty"`
 }
 
-//TODO set printcolumn +kubebuilder:printcolumn:name:="Alias",type=string,JSONPath=`.spec.alias`
-//TODO set printcolumn +kubebuilder:printcolumn:name:="Status",type=string,JSONPath=`.spec.status.expireadAt`
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=cin;prole
+// +kubebuilder:printcolumn:name="Expired",type="date",JSONPath=".status.expiredAt"
 
 // Cinderella is the Schema for the cinderellas API
 type Cinderella struct {

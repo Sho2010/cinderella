@@ -8,6 +8,10 @@ metadata:
   creationTimestamp: null
   name: cinderellas.cinderella.sho2010.dev
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.expiredAt
+    name: Expired
+    type: date
   group: cinderella.sho2010.dev
   names:
     kind: Cinderella
@@ -75,12 +79,11 @@ spec:
         status:
           description: CinderellaStatus defines the observed state of Cinderella
           properties:
-            expireadAt:
-              description: Expiread at binding account
+            expiredAt:
+              description: ExpiredAt is expired at binding account ExpiredAt is RFC
+                3339 date and time at which this resource will be deleted.
               format: date-time
               type: string
-          required:
-          - expireadAt
           type: object
       type: object
   version: v1alpha1
