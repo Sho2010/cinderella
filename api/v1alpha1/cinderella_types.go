@@ -35,6 +35,8 @@ type CinderellaSpec struct {
 	Encryption Encryption `json:"encryption,omitempty"`
 }
 
+// Term is expiration of temporary user
+// This is expressed as a date time, or a deadline such as 60min later.
 type Term struct {
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Type=string
@@ -45,21 +47,26 @@ type Term struct {
 	// +kubebuilder:validation:Type=string
 	// +kubebuilder:validation:Format=date-time
 
+	// RFC 3339
+	// e.g. "2020-12-01T00:00:00+09:00"
 	ExpiresDate string `json:"expiresDate,omitempty"`
 }
 
+// Note: Encryptionって名前は微妙な気がしてる...
+
+// Encryption is specifies where to get the public key.
 type Encryption struct {
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format:=string
 
-	// Use the github public key to encrypt the authentication file.
+	// Use the github registerd public key by user to encrypt the authentication file.
 	Github Github `json:"github,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format:=string
 
 	// Use this public key to encrypt the authentication file.
-	// key format is OpenSSH public key format.
+	// key format must be OpenSSH public key format.
 	PublicKey string `json:"publicKey,omitempty"`
 }
 
@@ -67,7 +74,7 @@ type Github struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
-	// Github UserID
+	// github user ID, fetch from https://github.com/<user>.keys
 	User string `json:"user,omitempty"`
 
 	// +kubebuilder:validation:Minimum=1
@@ -86,7 +93,7 @@ type CinderellaStatus struct {
 	// +kubebuilder:validation:Format=date-time
 
 	// ExpiredAt is expired at binding account
-	// ExpiredAt is RFC 3339 date and time at which this resource will be deleted.
+	// ExpiredAt is RFC 3339 format date and time at which this resource will be deleted.
 	ExpiredAt metav1.Time `json:"expiredAt,omitempty"`
 }
 
