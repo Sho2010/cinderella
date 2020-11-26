@@ -3,8 +3,14 @@ kind: Cinderella
 metadata:
   name: cinderella-sample
 spec:
+  roles:
+    - kind: "ClusterRole"
+      name: "cluster_role_name"
+    - kind: "Role"
+      name: "role_name"
   term:
-    expiresAfter: "60m"
+    expiresAfter: 30                           # Delete after 30 min later
+    expiresDate:  "2020-12-01T00:00:00+09:00"  # RFC3339 format
   encryption:
     github:
       user: sho2010
