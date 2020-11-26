@@ -91,7 +91,7 @@ type Encryption struct {
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format:=string
 
-	// Use the github registerd public key by user to encrypt the authentication file.
+	// Use the github registered public key by user to encrypt the authentication file.
 	Github Github `json:"github,omitempty"`
 
 	// +kubebuilder:validation:Optional
