@@ -26,6 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	cinderellav1alpha1 "github.com/Sho2010/cinderella/api/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // CinderellaReconciler reconciles a Cinderella object
@@ -47,6 +48,7 @@ func (r *CinderellaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	log.Info("start reconciler")
 
 	var cinderella cinderellav1alpha1.Cinderella
+
 	log.Info("fetching Cinderella Resource")
 	if err := r.Get(ctx, req.NamespacedName, &cinderella); err != nil {
 		log.Error(err, "unable to fetch Cinderella")
@@ -56,7 +58,15 @@ func (r *CinderellaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	log.Info("fetched item", "cinderella", cinderella)
+	// update cinderella.status
+	// 暫定対応、まだ設定されてないときのみ入れる
+	if cinderella.Status.ExpiredAt.IsZero() {
+		cinderella.Status.ExpiredAt = metav1.Now()
+		if err := r.Status().Update(ctx, &cinderella); err != nil {
+			log.Error(err, "cinderella status update failure")
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{}, nil
 }
