@@ -11,7 +11,7 @@ spec:
   additionalPrinterColumns:
   - JSONPath: .status.expiredAt
     format: date-time
-    name: Expired
+    name: Expired-At
     type: string
   group: cinderella.sho2010.dev
   names:
@@ -45,10 +45,12 @@ spec:
           description: CinderellaSpec defines the desired state of Cinderella
           properties:
             encryption:
+              description: Encryption by public key for passing files to temporary
+                user
               properties:
                 github:
-                  description: Use the github public key to encrypt the authentication
-                    file.
+                  description: Use the github registerd public key by user to encrypt
+                    the authentication file.
                   format: string
                   properties:
                     keyNumber:
@@ -58,21 +60,43 @@ spec:
                       minimum: 1
                       type: integer
                     user:
-                      description: Github UserID
+                      description: github user ID, fetch from https://github.com/<user>.keys
                       format: string
                       type: string
                   type: object
                 publicKey:
                   description: Use this public key to encrypt the authentication file.
-                    key format is OpenSSH public key format.
+                    key format must be OpenSSH public key format.
                   format: string
                   type: string
               type: object
+            roles:
+              description: roles for temporary user
+              items:
+                properties:
+                  kind:
+                    description: 'Types of roles to bind Valid values are: - "Role":
+                      - "ClusterRole":'
+                    enum:
+                    - ClusterRole
+                    - Role
+                    type: string
+                  name:
+                    description: '`ClusterRole` or `Role` Name'
+                    type: string
+                type: object
+              minItems: 1
+              type: array
             term:
+              description: expiration term of temporary user
               properties:
                 expiresAfter:
-                  type: string
+                  description: Temporary user is will be invalidated after specified
+                    value of ExpiresAfter The unit is minutes.
+                  format: int32
+                  type: integer
                 expiresDate:
+                  description: RFC 3339 e.g. "2020-12-01T00:00:00+09:00"
                   format: date-time
                   type: string
               type: object
@@ -80,9 +104,11 @@ spec:
         status:
           description: CinderellaStatus defines the observed state of Cinderella
           properties:
+            expired:
+              type: bool
             expiredAt:
               description: ExpiredAt is expired at binding account ExpiredAt is RFC
-                3339 date and time at which this resource will be deleted.
+                3339 format date and time at which this resource will be deleted.
               format: date-time
               type: string
           type: object
