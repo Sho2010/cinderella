@@ -20,6 +20,29 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +kubebuilder:validation:Enum=ClusterRole;Role
+type RoleKind string
+
+const (
+	NamespaceRole RoleKind = "Role"
+	ClusterRole   RoleKind = "ClusterRole"
+)
+
+type Role struct {
+	// +kubebuilder:validation:Required
+
+	// Types of roles to bind
+	// Valid values are:
+	// - "Role":
+	// - "ClusterRole":
+	Kind RoleKind `json:"kind,omitempty"`
+
+	// +kubebuilder:validation:Required
+
+	// `ClusterRole` or `Role` Name
+	Name string `json:"name,omitempty"`
+}
+
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // CinderellaSpec defines the desired state of Cinderella
@@ -27,11 +50,19 @@ type CinderellaSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinItems=1
 
+	// roles for temporary user
+	Roles []Role `json:"roles,omitempty"`
+
+	// +kubebuilder:validation:Required
+
+	// expiration term of temporary user
 	Term Term `json:"term,omitempty"`
 
 	// +kubebuilder:validation:Required
 
+	// Encryption by public key for passing files to temporary user
 	Encryption Encryption `json:"encryption,omitempty"`
 }
 
@@ -39,9 +70,10 @@ type CinderellaSpec struct {
 // This is expressed as a date time, or a deadline such as 60min later.
 type Term struct {
 	// +kubebuilder:validation:Optional
-	// +kubebuilder:validation:Type=string
 
-	ExpiresAfter string `json:"expiresAfter,omitempty"`
+	// Temporary user is will be invalidated after specified value of ExpiresAfter
+	// The unit is minutes.
+	ExpiresAfter *int32 `json:"expiresAfter,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Type=string
@@ -77,6 +109,8 @@ type Github struct {
 	// github user ID, fetch from https://github.com/<user>.keys
 	User string `json:"user,omitempty"`
 
+	// TODO: default 動かない
+	// _+kubebuilder:default:=1
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Optional
 
@@ -88,6 +122,9 @@ type Github struct {
 // CinderellaStatus defines the observed state of Cinderella
 type CinderellaStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// +kubebuilder:validation:Type=bool
+	Expired bool `json:"expired,omitempty"`
 
 	// +kubebuilder:validation:Type=string
 	// +kubebuilder:validation:Format=date-time
