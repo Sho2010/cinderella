@@ -106,7 +106,7 @@ type Github struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
-	// github user ID, fetch from https://github.com/<user>.keys
+	// github user ID, fetch from https://github.com/<user>.gpg
 	User string `json:"user,omitempty"`
 
 	// TODO: default 動かない
@@ -114,7 +114,7 @@ type Github struct {
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Optional
 
-	// KeyNumber is line number of https://github.com/<user>.keys
+	// KeyNumber is line number of https://github.com/<user>.gpg
 	// Default value: 1
 	KeyNumber *int32 `json:"keyNumber,omitempty"`
 }
