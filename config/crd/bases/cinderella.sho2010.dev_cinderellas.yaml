@@ -20,9 +20,8 @@ spec:
     plural: cinderellas
     shortNames:
     - cin
-    - prole
     singular: cinderella
-  scope: Namespaced
+  scope: Cluster
   subresources:
     status: {}
   validation:

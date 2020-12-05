@@ -140,7 +140,7 @@ type CinderellaStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:shortName=cin;prole
+// +kubebuilder:resource:shortName=cin,scope=Cluster
 // +kubebuilder:printcolumn:name="Expired-At",type="string",JSONPath=".status.expiredAt",format="date-time"
 
 // Cinderella is the Schema for the cinderellas API
