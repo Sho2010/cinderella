@@ -49,18 +49,18 @@ spec:
                 user
               properties:
                 github:
-                  description: Use the github registerd public key by user to encrypt
+                  description: Use the github registered public key by user to encrypt
                     the authentication file.
                   format: string
                   properties:
                     keyNumber:
-                      description: 'KeyNumber is line number of https://github.com/<user>.keys
+                      description: 'KeyNumber is line number of https://github.com/<user>.gpg
                         Default value: 1'
                       format: int32
                       minimum: 1
                       type: integer
                     user:
-                      description: github user ID, fetch from https://github.com/<user>.keys
+                      description: github user ID, fetch from https://github.com/<user>.gpg
                       format: string
                       type: string
                   type: object
