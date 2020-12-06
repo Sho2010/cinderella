@@ -123,8 +123,10 @@ type Github struct {
 type CinderellaStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// +kubebuilder:validation:Type=bool
-	Expired bool `json:"expired,omitempty"`
+	// +kubebuilder:validation:Type=boolean
+
+	// Expired this resource
+	Expired *bool `json:"expired,omitempty"`
 
 	// +kubebuilder:validation:Type=string
 	// +kubebuilder:validation:Format=date-time
@@ -142,6 +144,7 @@ type CinderellaStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=cin,scope=Cluster
 // +kubebuilder:printcolumn:name="Expired-At",type="string",JSONPath=".status.expiredAt",format="date-time"
+// +kubebuilder:printcolumn:name="Expired",type="boolean",JSONPath=".status.expired"
 
 // Cinderella is the Schema for the cinderellas API
 type Cinderella struct {
