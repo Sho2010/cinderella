@@ -13,6 +13,9 @@ spec:
     format: date-time
     name: Expired-At
     type: string
+  - JSONPath: .status.expired
+    name: Expired
+    type: boolean
   group: cinderella.sho2010.dev
   names:
     kind: Cinderella
@@ -20,9 +23,8 @@ spec:
     plural: cinderellas
     shortNames:
     - cin
-    - prole
     singular: cinderella
-  scope: Namespaced
+  scope: Cluster
   subresources:
     status: {}
   validation:
@@ -49,18 +51,18 @@ spec:
                 user
               properties:
                 github:
-                  description: Use the github registerd public key by user to encrypt
+                  description: Use the github registered public key by user to encrypt
                     the authentication file.
                   format: string
                   properties:
                     keyNumber:
-                      description: 'KeyNumber is line number of https://github.com/<user>.keys
+                      description: 'KeyNumber is line number of https://github.com/<user>.gpg
                         Default value: 1'
                       format: int32
                       minimum: 1
                       type: integer
                     user:
-                      description: github user ID, fetch from https://github.com/<user>.keys
+                      description: github user ID, fetch from https://github.com/<user>.gpg
                       format: string
                       type: string
                   type: object
@@ -105,7 +107,8 @@ spec:
           description: CinderellaStatus defines the observed state of Cinderella
           properties:
             expired:
-              type: bool
+              description: Expired this resource
+              type: boolean
             expiredAt:
               description: ExpiredAt is expired at binding account ExpiredAt is RFC
                 3339 format date and time at which this resource will be deleted.
