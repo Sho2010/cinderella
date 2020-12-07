@@ -63,22 +63,7 @@ func (r *CinderellaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// update cinderella.status
-	if c.Status.ExpiredAt.IsZero() {
-		// TODO Term を使ってちゃんと設定する
-		c.Status.ExpiredAt = metav1.NewTime(time.Now().Add(1 * time.Minute))
-		tmp := false
-		c.Status.Expired = &tmp
-	}
-
-	now := metav1.Now()
-	expired := c.Status.ExpiredAt.Before(&now)
-	c.Status.Expired = &expired
-
-	if err := r.Status().Update(ctx, &c); err != nil {
-		log.Error(err, "cinderella status update failure")
-		return ctrl.Result{}, err
-	}
+	r.updateStatus(ctx, log, &c)
 
 	crb, err := buildServiceAccount(c)
 	if err != nil {
@@ -131,6 +116,43 @@ func buildServiceAccount(c cinderellav1alpha1.Cinderella) (*rbacv1.ClusterRoleBi
 	}
 
 	return crb, nil
+}
+
+func (r *CinderellaReconciler) updateStatus(ctx context.Context, log logr.Logger, c *cinderellav1alpha1.Cinderella) error {
+
+	if c.Status.Expired == nil {
+		tmp := false
+		c.Status.Expired = &tmp
+	}
+
+	const f = "2006/01/02 15:04:05" // 24h表現、0埋めあり
+
+	// TODO: validationAPI で両方設定された場合はエラーとする
+	// TODO: ExpiresAfterが編集された場合 nil周りのバグあり, ExpiresAfter > 消す >　戻す で再現するはず
+	if c.Spec.Term.ExpiresAfter != nil {
+		duration := time.Duration(*c.Spec.Term.ExpiresAfter)
+		c.Status.ExpiredAt = metav1.NewTime(c.CreationTimestamp.Add(duration * time.Minute))
+
+		log.V(1).Info("CreationTimestamp", "creationTimestamp", c.CreationTimestamp.Format(f))
+		log.Info("ExpireadAt set from ExpiresAfter", "ExpiredAt", c.Status.ExpiredAt.Format(f), "ExpiresAfter", *c.Spec.Term.ExpiresAfter)
+
+	} else if len(c.Spec.Term.ExpiresDate) != 0 {
+		t, _ := time.Parse(time.RFC3339, c.Spec.Term.ExpiresDate)
+		c.Status.ExpiredAt = metav1.NewTime(t)
+
+		log.V(1).Info("CreationTimestamp", "creationTimestamp", c.CreationTimestamp.Format(f))
+		log.Info("ExpireadAt set from ExpiresDate", "ExpiredAt", c.Status.ExpiredAt.Format(f), "ExpiresDate", c.Spec.Term.ExpiresDate)
+	}
+
+	now := metav1.Now()
+	expired := c.Status.ExpiredAt.Before(&now)
+	c.Status.Expired = &expired
+
+	if err := r.Status().Update(ctx, c); err != nil {
+		log.Error(err, "cinderella status update failure")
+		return err
+	}
+	return nil
 }
 
 func (r *CinderellaReconciler) deleteExpiredResources(ctx context.Context, log logr.Logger, c *cinderellav1alpha1.Cinderella) error {
