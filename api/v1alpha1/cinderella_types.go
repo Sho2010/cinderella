@@ -86,7 +86,7 @@ type Term struct {
 
 // Note: Encryptionって名前は微妙な気がしてる...
 
-// Encryption is specifies where to get the public key.
+// Encryption is specifies where to get the gpg public key.
 type Encryption struct {
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format:=string
